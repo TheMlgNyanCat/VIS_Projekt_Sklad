@@ -19,8 +19,8 @@ pip install -r requirements.txt
 Vytvoř databázi v PostgreSQL:
 psql -U postgres -c "CREATE DATABASE sklad;"
 
-Nahraj schéma:
-psql -U postgres -d sklad -f schema.sql
+Nastav .env soubor (viz krok 4) a pak spusť:
+python setup.py
 
 ### 4. Konfigurace
 Zkopíruj `.env.example` jako `.env` a vyplň údaje:
