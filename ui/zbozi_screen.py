@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton,
     QLineEdit, QComboBox, QTableWidget, QTableWidgetItem,
-    QHeaderView, QDialog, QFormLayout, QDoubleSpinBox,
+    QHeaderView, QDialog, QFormLayout, QDoubleSpinBox, QInputDialog,
     QSpinBox, QMessageBox, QDialogButtonBox
 )
 from PyQt6.QtCore import Qt
@@ -29,7 +29,14 @@ class ZboziDialog(QDialog):
         if data:
             idx = next((i for i, k in enumerate(kategorie) if k['id'] == data['kategorie_id']), 0)
             self.kategorie_cb.setCurrentIndex(idx)
-        layout.addRow("Kategorie:", self.kategorie_cb)
+
+        kat_row = QHBoxLayout()
+        kat_row.addWidget(self.kategorie_cb)
+        btn_nova_kat = QPushButton("+")
+        btn_nova_kat.setFixedWidth(28)
+        btn_nova_kat.clicked.connect(self._add_kategorie)
+        kat_row.addWidget(btn_nova_kat)
+        layout.addRow("Kategorie:", kat_row)
 
         self.jednotka = QComboBox()
         self.jednotka.addItems(["ks", "kg", "l", "m", "m²", "bal"])
@@ -63,7 +70,17 @@ class ZboziDialog(QDialog):
             "min_mnozstvi":    self.min_mnozstvi.value(),
             "cena_za_jednotku": self.cena.value(),
         }
-
+        
+    def _add_kategorie(self):
+        nazev, ok = QInputDialog.getText(self, "Nová kategorie", "Název kategorie:")
+        if ok and nazev.strip():
+            mp.create_kategorie(nazev.strip())
+            nove = mp.get_all_kategorie()
+            self.kategorie_cb.clear()
+            for k in nove:
+                self.kategorie_cb.addItem(k['nazev'], k['id'])
+            idx = next((i for i, k in enumerate(nove) if k['nazev'] == nazev.strip()), 0)
+            self.kategorie_cb.setCurrentIndex(idx)
 
 class ZboziScreen(QWidget):
     def __init__(self):
